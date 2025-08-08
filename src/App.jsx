@@ -1,0 +1,110 @@
+import React, { useState, useEffect, useContext } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { Context } from "./main";
+
+
+// Import des pages
+import Login from "./hospital/login.jsx";
+import Home from "./hospital/Home.jsx";
+import HospitalDashboardPage from "./hospital/HospitalDashboardPage";
+import HospitalServicesPage from "./hospital/HospitalServicesPage";
+import HospitalDoctorsPage from "./hospital/HospitalDoctorsPage";
+import HospitalBedsPage from "./hospital/HospitalBedsPage";
+import HospitalAdmissionsPage from "./hospital/HospitalAdmissionsPage";
+import HospitalInventoryPage from "./hospital/HospitalInventoryPage";
+import NurseManagementPage from "./hospital/nurseControllePage";
+// import HospitalDoctorsPage from "./hospital/hopitalDoctor.jsx";
+import HospitalPharmacyPage from "./hospital/HospitalPharmacyPage.jsx";
+import AccountingPage from "./hospital/AccountingPage.jsx";
+import PatientsListPage from "./hospital/ListPatient.jsx";
+import AddPatientForm from "./hospital/Addpatient.jsx";
+import API from "@/axios/axios.js";
+
+// Composant route protégée
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useContext(Context);
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
+};
+
+const App = () => {
+  const { isAuthenticated, setIsAuthenticated, hospital, setHospital } = useContext(Context);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await API.get("/api/v1/user/hospital/me", {
+          withCredentials: true,
+        });
+        setIsAuthenticated(true);
+        setHospital(response.data.user);
+      } catch (error) {
+        setIsAuthenticated(false);
+        setHospital({});
+      } finally {
+        setLoading(false); // Important !
+      }
+    };
+
+    fetchUser();
+  }, [setIsAuthenticated, setHospital]);
+
+  if (loading) {
+    return <div className="text-center py-8">Chargement...</div>;
+  }
+
+  return (
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <main className="max-w-7xl mx-auto py-8 px-4 min-h-[calc(100vh-64px)]">
+          <Routes>
+            {/* Page d'accueil redirige vers login */}
+            <Route path="/" element={<Navigate to="/hospital/home" replace />} />
+
+            {/* Page login */}
+            <Route path="/login" element={<Login />} />
+
+            {/* Routes protégées */}
+            <Route path="/hospital/home" element={
+              <PrivateRoute><Home /></PrivateRoute>
+            } />
+            <Route path="/hospital/dashboard" element={
+              <PrivateRoute><HospitalDashboardPage /></PrivateRoute>
+            } />
+            <Route path="/hospital/services" element={
+              <PrivateRoute><HospitalServicesPage /></PrivateRoute>
+            } />
+            <Route path="/hospital/doctors" element={
+              <PrivateRoute><HospitalDoctorsPage /></PrivateRoute>
+            } />
+            <Route path="/hospital/beds" element={
+              <PrivateRoute><HospitalBedsPage /></PrivateRoute>
+            } />
+            <Route path="/hospital/admissions" element={
+              <PrivateRoute><HospitalAdmissionsPage /></PrivateRoute>
+            } />
+            <Route path="/hospital/inventory" element={
+              <PrivateRoute><HospitalInventoryPage /></PrivateRoute>
+            } />
+             <Route path="/hospital/nurse" element={
+              <PrivateRoute><NurseManagementPage /></PrivateRoute>
+            } />
+             {/* <Route path="/hospital/all" element={<HospitalDoctorsPage />} /> */}
+             <Route path="/pharmacy" element={<HospitalPharmacyPage />} />
+             <Route path="/accounting" element={<AccountingPage />} />
+             <Route path="/list/patient" element={<PatientsListPage />} />
+             <Route path="/add/patient" element={<AddPatientForm />} />
+            {/* Catch-all : redirection vers login si route inconnue */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+          <ToastContainer />
+        </main>
+      </div>
+    </Router>
+  );
+};
+
+export default App;
