@@ -11,16 +11,16 @@ const HospitalPatientsPage = () => {
   const [query, setQuery] = useState("");
 
   const fetchPatients = async () => {
-  try {
-    const { data } = await API.get("/api/v1/patients", {
-      withCredentials: true,
-    });
-    setPatients(data.patients); // Assure-toi que c’est `data.patients`, pas `data`
-  } catch (error) {
-    console.error("❌ Erreur lors de l'appel API:", error.response?.data || error.message);
-    toast.error("Erreur lors du chargement des patients");
-  }
-};
+    try {
+      const { data } = await API.get("/api/v1/patients", {
+        withCredentials: true,
+      });
+      setPatients(data.patients); // Assure-toi que c’est `data.patients`, pas `data`
+    } catch (error) {
+      console.error("❌ Erreur lors de l'appel API:", error.response?.data || error.message);
+      toast.error("Erreur lors du chargement des patients");
+    }
+  };
 
 
   useEffect(() => {
@@ -66,68 +66,90 @@ const HospitalPatientsPage = () => {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gray-50">
-      <h1 className="text-3xl font-bold text-center mb-6 text-emerald-700">Patients enregistrés</h1>
+    <div className="min-h-screen p-4 md:p-8 bg-gray-50 font-sans">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-8 text-emerald-700">
+        Patients enregistrés
+      </h1>
 
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-        <div className="flex w-full md:w-1/2 bg-white border rounded-lg shadow-sm">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+        <div className="relative w-full md:w-1/2">
           <input
             type="text"
             placeholder="Rechercher un patient..."
-            className="flex-1 px-4 py-2 rounded-l-lg focus:outline-none"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all shadow-sm"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button className="px-4 py-2 bg-emerald-600 text-white rounded-r-lg hover:bg-emerald-700">
+          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
             <FaSearch />
-          </button>
+          </span>
         </div>
 
         <div className="flex gap-2">
-          <button onClick={exportExcel} className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 flex items-center gap-2">
+          <button
+            onClick={exportExcel}
+            className="bg-green-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-green-700 transition-colors shadow-md flex items-center gap-2 transform hover:scale-105"
+          >
             <FaFileExcel /> Excel
           </button>
-          <button onClick={exportPDF} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 flex items-center gap-2">
+          <button
+            onClick={exportPDF}
+            className="bg-red-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-red-700 transition-colors shadow-md flex items-center gap-2 transform hover:scale-105"
+          >
             <FaFilePdf /> PDF
           </button>
         </div>
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-xl shadow">
-        <table className="w-full table-auto">
-          <thead className="bg-emerald-600 text-white">
-            <tr>
-              <th className="px-4 py-3">Nom</th>
-              <th className="px-4 py-3">Date de naissance</th>
-              <th className="px-4 py-3">Téléphone</th>
-              <th className="px-4 py-3">Genre</th>
-              <th className="px-4 py-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((p) => (
-              <tr key={p._id} className="text-center border-b">
-                <td className="px-4 py-3">{p.fullName}</td>
-                <td className="px-4 py-3">{p.dateOfBirth}</td>
-                <td className="px-4 py-3">{p.contact.phone}</td>
-                <td className="px-4 py-3">{p.gender}</td>
-                <td className="px-4 py-3 flex justify-center gap-2">
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    <FaEdit />
-                  </button>
-                  <button onClick={() => handleDelete(p._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                    <FaTrash />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {filtered.length === 0 && (
+      <div className="overflow-hidden bg-white rounded-2xl shadow-xl border border-gray-200">
+        <div className="overflow-x-auto">
+          <table className="min-w-full table-auto">
+            <thead className="bg-emerald-600 text-white">
               <tr>
-                <td colSpan="5" className="py-6 text-gray-500 text-center">Aucun patient trouvé</td>
+                <th className="px-6 py-4 text-left">Nom</th>
+                <th className="px-6 py-4 text-left">Date de naissance</th>
+                <th className="px-6 py-4 text-left">Téléphone</th>
+                <th className="px-6 py-4 text-left">Genre</th>
+                <th className="px-6 py-4 text-center">Actions</th>
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((p, index) => (
+                <tr
+                  key={p._id}
+                  className={`border-b text-gray-700 transition-all duration-200 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } hover:bg-emerald-50`}
+                >
+                  <td className="px-6 py-4 font-semibold">{p.fullName}</td>
+                  <td className="px-6 py-4">{p.dateOfBirth}</td>
+                  <td className="px-6 py-4">{p.contact.phone}</td>
+                  <td className="px-6 py-4">{p.gender}</td>
+                  <td className="px-6 py-4 flex justify-center gap-2">
+                    <button
+                      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(p._id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors shadow-sm"
+                    >
+                      <FaTrash />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="py-8 text-gray-500 text-center text-lg">
+                    Aucun patient trouvé
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -9,19 +9,24 @@ import { Context } from "./main";
 // Import des pages
 import Login from "./hospital/login.jsx";
 import Home from "./hospital/Home.jsx";
-import HospitalDashboardPage from "./hospital/HospitalDashboardPage";
+import HospitalDashboard from "./hospital/HospitalDashboardPage";
 import HospitalServicesPage from "./hospital/HospitalServicesPage";
 import HospitalDoctorsPage from "./hospital/HospitalDoctorsPage";
 import HospitalBedsPage from "./hospital/HospitalBedsPage";
 import HospitalAdmissionsPage from "./hospital/HospitalAdmissionsPage";
 import HospitalInventoryPage from "./hospital/HospitalInventoryPage";
 import NurseManagementPage from "./hospital/nurseControllePage";
-// import HospitalDoctorsPage from "./hospital/hopitalDoctor.jsx";
+import HospitalDoctors from "./hospital/hopitalDoctor.jsx";
 import HospitalPharmacyPage from "./hospital/HospitalPharmacyPage.jsx";
 import AccountingPage from "./hospital/AccountingPage.jsx";
 import PatientsListPage from "./hospital/ListPatient.jsx";
 import AddPatientForm from "./hospital/Addpatient.jsx";
 import API from "@/axios/axios.js";
+import BloodStockPage from "./hospital/BloodStockPage.jsx";
+import DeathPage from "./hospital/DeathPage.jsx";
+import BirthPage from "./hospital/birthPage.jsx";
+import NurseShiftsPage from './hospital/NurseShiftsPage.jsx';
+
 
 // Composant route protégée
 const PrivateRoute = ({ children }) => {
@@ -72,7 +77,7 @@ const App = () => {
               <PrivateRoute><Home /></PrivateRoute>
             } />
             <Route path="/hospital/dashboard" element={
-              <PrivateRoute><HospitalDashboardPage /></PrivateRoute>
+              <PrivateRoute><HospitalDashboard /></PrivateRoute>
             } />
             <Route path="/hospital/services" element={
               <PrivateRoute><HospitalServicesPage /></PrivateRoute>
@@ -97,8 +102,13 @@ const App = () => {
              <Route path="/accounting" element={<AccountingPage />} />
              <Route path="/list/patient" element={<PatientsListPage />} />
              <Route path="/add/patient" element={<AddPatientForm />} />
+             <Route path="/blood/stock" element={<BloodStockPage />} />
+             <Route path="/birth" element={<BirthPage />} />
+             <Route path="/death" element={<DeathPage />} />
+             <Route path="/doctor/get" element={<HospitalDoctors />} />
             {/* Catch-all : redirection vers login si route inconnue */}
             <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="/nurses/shifts" element={<NurseShiftsPage />} />
           </Routes>
           <ToastContainer />
         </main>

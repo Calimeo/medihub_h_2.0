@@ -25,7 +25,7 @@ export default function AccountingPage() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await API.get("/api/v1/accounting");
+      const res = await API.get("/api/v1/accounting/my-entries");
       setTransactions(res.data);
     } catch (err) {
       toast.error("Erreur lors du chargement des transactions");
@@ -56,7 +56,7 @@ export default function AccountingPage() {
     e.preventDefault();
     if (formData.amount <= 0) return toast.error("Montant invalide");
     try {
-      await API.post("/api/v1/accounting", formData);
+      await API.post("/api/v1/accounting/add", formData);
       toast.success("Transaction ajoutée");
       setFormData({ type: "income", category: "", amount: "", date: "", description: "" });
       fetchTransactions();

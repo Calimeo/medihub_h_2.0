@@ -1,26 +1,29 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import API from "@/axios/axios.js";
+import { useParams } from "react-router-dom";
 
 export default function HospitalBedsPage() {
+  const { hospitalId } = useParams();
   const [rooms, setRooms] = useState([]);
   const [roomNameInput, setRoomNameInput] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [bedNumberInput, setBedNumberInput] = useState("");
   const [error, setError] = useState("");
 
-  // Charger les chambres
   useEffect(() => {
-    fetchRooms();
-  }, []);
+    if (hospitalId) {
+      fetchRooms();
+    }
+  }, [hospitalId]);
 
   const fetchRooms = async () => {
     try {
-      const res = await API.get("/api/rooms");
+      const res = await API.get(`/api/hospitals/${hospitalId}/rooms`);
       setRooms(res.data);
     } catch (err) {
       toast.error("Erreur de chargement des chambres.");
+      console.error("Détails:", err.response?.data);
     }
   };
 
@@ -32,7 +35,7 @@ export default function HospitalBedsPage() {
     }
 
     try {
-      await API.post("/api/rooms", {
+      await API.post(`/api/hospitals/${hospitalId}/rooms`, {
         name: roomNameInput.trim(),
       });
       toast.success("Chambre ajoutée.");
@@ -40,7 +43,7 @@ export default function HospitalBedsPage() {
       fetchRooms();
     } catch (err) {
       setError(
-        err.response?.data?.message || "Erreur lors de l’ajout de la chambre."
+        err.response?.data?.message || "Erreur lors de l'ajout de la chambre."
       );
     }
   };
@@ -48,12 +51,12 @@ export default function HospitalBedsPage() {
   const deleteRoom = async (id) => {
     if (window.confirm("Confirmer la suppression de la chambre ?")) {
       try {
-        await API.delete(`/api/rooms/${id}`);
+        await API.delete(`/api/hospitals/${hospitalId}/rooms/${id}`);
         toast.success("Chambre supprimée.");
         if (selectedRoomId === id) setSelectedRoomId(null);
         fetchRooms();
-      } catch {
-        toast.error("Erreur lors de la suppression.");
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Erreur lors de la suppression.");
       }
     }
   };
@@ -66,26 +69,26 @@ export default function HospitalBedsPage() {
     }
 
     try {
-      await API.post(
-        `/api/rooms/${selectedRoomId}/beds`,
-        { number: bedNumberInput.trim() }
-      );
+      await API.post(`/api/rooms/${selectedRoomId}/beds`, {
+        number: bedNumberInput.trim(),
+        hospitalId // Important: envoie hospitalId dans le body comme requis
+      });
       toast.success("Lit ajouté.");
       setBedNumberInput("");
       fetchRooms();
     } catch (err) {
-      setError(err.response?.data?.message || "Erreur lors de l’ajout du lit.");
+      setError(err.response?.data?.message || "Erreur lors de l'ajout du lit.");
     }
   };
 
   const toggleBedAvailability = async (roomId, bedId) => {
     try {
       await API.put(
-        `/api/rooms/${roomId}/beds/${bedId}/toggle`
+        `/api/hospitals/${hospitalId}/rooms/${roomId}/beds/${bedId}/toggle`
       );
       fetchRooms();
-    } catch {
-      toast.error("Erreur lors de la modification de disponibilité.");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Erreur lors de la modification.");
     }
   };
 
@@ -93,12 +96,12 @@ export default function HospitalBedsPage() {
     if (window.confirm("Confirmer la suppression du lit ?")) {
       try {
         await API.delete(
-          `/api/rooms/${roomId}/beds/${bedId}`
+          `/api/hospitals/${hospitalId}/rooms/${roomId}/beds/${bedId}`
         );
         toast.success("Lit supprimé.");
         fetchRooms();
-      } catch {
-        toast.error("Erreur lors de la suppression du lit.");
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Erreur lors de la suppression.");
       }
     }
   };
@@ -108,13 +111,12 @@ export default function HospitalBedsPage() {
   return (
     <div className="max-w-7xl mx-auto bg-white p-8 rounded shadow space-y-12">
       <h1 className="text-3xl font-bold text-red-700 text-center mb-6">
-        Gestion des lits et chambres
+        Gestion des lits et chambres - Hôpital {hospitalId}
       </h1>
 
       <section>
         <h2 className="text-2xl font-semibold text-red-600 mb-4">Chambres</h2>
         <div className="flex flex-col md:flex-row gap-8">
-          {/* Liste des chambres */}
           <div className="md:w-1/3">
             <div className="flex gap-2 mb-4">
               <input
@@ -163,7 +165,6 @@ export default function HospitalBedsPage() {
             )}
           </div>
 
-          {/* Lits */}
           <div className="md:w-2/3">
             <h3 className="font-semibold text-lg mb-3">
               Lits {selectedRoom ? `(chambre ${selectedRoom.name})` : ""}
@@ -187,32 +188,32 @@ export default function HospitalBedsPage() {
                     Ajouter lit
                   </button>
                 </div>
-                {selectedRoom.beds.length === 0 ? (
+                {selectedRoom.beds?.length === 0 ? (
                   <p className="italic text-gray-600">Aucun lit créé.</p>
                 ) : (
                   <ul className="divide-y divide-gray-200 border border-gray-300 rounded max-h-[350px] overflow-y-auto">
-                    {selectedRoom.beds.map(({ _id, number, available }) => (
+                    {selectedRoom.beds?.map((bed) => (
                       <li
-                        key={_id}
+                        key={bed._id}
                         className="flex justify-between items-center px-4 py-3 hover:bg-red-50"
                       >
-                        <span>{number}</span>
+                        <span>{bed.number}</span>
                         <div className="flex items-center gap-4">
                           <button
                             onClick={() =>
-                              toggleBedAvailability(selectedRoom._id, _id)
+                              toggleBedAvailability(selectedRoom._id, bed._id)
                             }
                             className={`px-3 py-1 rounded font-semibold transition ${
-                              available
+                              bed.available
                                 ? "bg-green-600 hover:bg-green-700 text-white"
                                 : "bg-gray-300 hover:bg-gray-400 text-gray-700"
                             }`}
                           >
-                            {available ? "Disponible" : "Indisponible"}
+                            {bed.available ? "Disponible" : "Indisponible"}
                           </button>
                           <button
                             onClick={() =>
-                              deleteBed(selectedRoom._id, _id)
+                              deleteBed(selectedRoom._id, bed._id)
                             }
                             className="text-red-600 hover:text-red-800 font-bold text-xl"
                           >
