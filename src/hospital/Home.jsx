@@ -16,7 +16,8 @@ import {
   FaUserNurse, 
   FaClinicMedical,
   FaBaby,
-  FaHandHoldingWater
+  FaHandHoldingWater,
+  FaDna
 } from "react-icons/fa";
 import { 
   BsCapsulePill,
@@ -48,7 +49,7 @@ const links = [
     bgColor: "bg-sky-50 hover:bg-sky-100"
   },
   {
-    to: "/hospital/beds",
+    to: "/rooms/management",
     label: "Lits & Chambres",
     icon: <MdHotel className="text-4xl text-yellow-500" />,
     bgColor: "bg-yellow-50 hover:bg-yellow-100"
@@ -126,9 +127,9 @@ const links = [
     bgColor: "bg-amber-50 hover:bg-amber-100"
   },
   {
-    to: "/dialysis",
-    label: "Dialyse",
-    icon: <FaHandHoldingWater className="text-4xl text-blue-400" />,
+    to: "/labo",
+    label: "Laboratoire",
+    icon: <FaDna className="text-4xl text-blue-400" />,
     bgColor: "bg-blue-50 hover:bg-blue-100"
   }
 ];

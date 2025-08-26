@@ -10,10 +10,10 @@ import { Context } from "./main";
 import Login from "./hospital/login.jsx";
 import Home from "./hospital/Home.jsx";
 import HospitalDashboard from "./hospital/HospitalDashboardPage";
-import HospitalServicesPage from "./hospital/HospitalServicesPage";
+import ServiceManagement from "./hospital/HospitalServicesPage";
 import HospitalDoctorsPage from "./hospital/HospitalDoctorsPage";
 import HospitalBedsPage from "./hospital/HospitalBedsPage";
-import HospitalAdmissionsPage from "./hospital/HospitalAdmissionsPage";
+import AdmissionManagement from "./hospital/HospitalAdmissionsPage";
 import HospitalInventoryPage from "./hospital/HospitalInventoryPage";
 import NurseManagementPage from "./hospital/nurseControllePage";
 import HospitalDoctors from "./hospital/hopitalDoctor.jsx";
@@ -26,6 +26,8 @@ import BloodStockPage from "./hospital/BloodStockPage.jsx";
 import DeathPage from "./hospital/DeathPage.jsx";
 import BirthPage from "./hospital/birthPage.jsx";
 import NurseShiftsPage from './hospital/NurseShiftsPage.jsx';
+import LaboratoryManagement from "./hospital/laboratoire.jsx";
+import HospitalRoomManagement from "./hospital/hopitalRoomManager.jsx";
 
 
 // Composant route protégée
@@ -80,7 +82,7 @@ const App = () => {
               <PrivateRoute><HospitalDashboard /></PrivateRoute>
             } />
             <Route path="/hospital/services" element={
-              <PrivateRoute><HospitalServicesPage /></PrivateRoute>
+              <PrivateRoute><ServiceManagement /></PrivateRoute>
             } />
             <Route path="/hospital/doctors" element={
               <PrivateRoute><HospitalDoctorsPage /></PrivateRoute>
@@ -89,7 +91,7 @@ const App = () => {
               <PrivateRoute><HospitalBedsPage /></PrivateRoute>
             } />
             <Route path="/hospital/admissions" element={
-              <PrivateRoute><HospitalAdmissionsPage /></PrivateRoute>
+              <PrivateRoute><AdmissionManagement /></PrivateRoute>
             } />
             <Route path="/hospital/inventory" element={
               <PrivateRoute><HospitalInventoryPage /></PrivateRoute>
@@ -106,6 +108,8 @@ const App = () => {
              <Route path="/birth" element={<BirthPage />} />
              <Route path="/death" element={<DeathPage />} />
              <Route path="/doctor/get" element={<HospitalDoctors />} />
+             <Route path="/labo" element={<LaboratoryManagement />} />
+             <Route path="/rooms/management"element={<HospitalRoomManagement />} />
             {/* Catch-all : redirection vers login si route inconnue */}
             <Route path="*" element={<Navigate to="/login" replace />} />
             <Route path="/nurses/shifts" element={<NurseShiftsPage />} />
